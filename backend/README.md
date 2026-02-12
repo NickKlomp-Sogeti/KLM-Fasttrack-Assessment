@@ -93,3 +93,9 @@ The application will start on `http://localhost:8080`.
 Navigate to `http://localhost:8080/swagger-ui.html` 
 to explore the API documentation and test endpoints. 
 
+## Future Improvements
+- Implement authentication and authorization.
+- Soft delete for holidays instead of hard delete.
+- Automatic logging of holiday creation and deletion.
+- Database migration using Flyway or Liquibase.
+- More comprehensive unit and integration tests.
