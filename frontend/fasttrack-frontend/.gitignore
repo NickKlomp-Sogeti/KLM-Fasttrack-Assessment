@@ -1,0 +1,60 @@
+# =========================
+# Node
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# Angular build output
+# =========================
+dist/
+out-tsc/
+.angular/
+.tmp/
+.cache/
+
+# =========================
+# Test coverage
+# =========================
+coverage/
+
+# =========================
+# Environment files (optional strategy)
+# =========================
+# Uncomment if you store secrets locally
+# src/environments/environment.local.ts
+
+# =========================
+# IDEs / Editors
+# =========================
+
+# VS Code
+.vscode/
+!.vscode/extensions.json
+
+# IntelliJ / WebStorm
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+
+# =========================
+# Temporary files
+# =========================
+*.tmp
+*.temp

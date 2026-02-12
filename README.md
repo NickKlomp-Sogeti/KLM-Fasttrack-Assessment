@@ -1,95 +1,129 @@
-# FastTrack Holidays – KLM Assessment
+# FastTrack Holidays – Fullstack CRUD Application
 
-## Overview
+## 📌 Overview
 
-This project is a Spring Boot backend application developed as part of the KLM FastTrack technical assessment.
+This project represents the first sprint implementation of the **FastTrack Holidays** application.
 
-The current implementation covers:
+The goal of the application is to provide crew members with a self-service platform to manage their holidays in a structured and rule-compliant manner.
 
-### User Story 1
-> *As a crew member, I want to view an overview of my scheduled holidays.*
+This implementation delivers a minimal viable product (MVP) supporting:
 
-### User Story 2
-> *As a crew member, I want to schedule (create) a valid new holiday.*
+- Viewing scheduled holidays
+- Creating a new holiday
+- Deleting a holiday
 
-The application provides REST endpoints to retrieve and create holiday data, including validation of business rules.
+The following business rules are enforced:
 
----
+- Holidays must not overlap (including between different crew members)
+- A minimum gap of 3 working days between holidays is required
+- A holiday must be scheduled at least 5 working days before its start date
+- A holiday must be cancelled at least 5 working days before its start date
 
-## Tech Stack
-
-- Java 21
-- Spring Boot
-- Spring Data JPA
-- H2 (in-memory database)
-- Swagger / OpenAPI
-- JUnit 5 + Mockito
+The focus of this sprint is on clean architecture, maintainability, and correct business rule implementation rather than UI styling.
 
 ---
 
-## Architecture
+## 🏗️ Architecture
 
-The application follows a layered architecture:
+This is a fullstack CRUD application consisting of:
 
-Controller → Service → Repository → Database
+- **Backend**: Java + Spring Boot (REST API)
+- **Frontend**: Angular (Single Page Application)
+- **Database**: In-memory H2 database
 
-Responsibilities are separated as follows:
+Frontend and backend communicate through RESTful HTTP endpoints using JSON.
 
-- **Controller**  
-  Handles HTTP requests and responses.
-
-- **Service**  
-  Contains business logic and validation rules.
-
-- **Repository**  
-  Handles database interaction using Spring Data JPA.
-
-A DTO layer is used to prevent exposing JPA entities directly.
-
-Global exception handling is implemented using `@RestControllerAdvice` to return consistent HTTP error responses.
-
-Seed data is provided via `data.sql` to allow immediate testing.
+```
+root
+├── backend
+└── frontend
+```
 
 ---
 
-## Implemented Endpoints
+## 🖥 Backend
 
-### GET `/holidays`
+The backend is built using Spring Boot and follows a layered architecture.
 
-Returns all holidays.
+Business logic is separated from controllers and implemented in dedicated service classes.
 
-### GET `/holidays/employee/{employeeId}`
+### Key Characteristics
 
-Returns holidays for a specific employee.
+- RESTful API design
+- Layered architecture (Controller → Service → Repository)
+- DTO-based request/response handling
+- Validation at the API boundary
+- Business rule enforcement in the service layer
+- JPA for persistence
+- In-memory H2 database
 
-### POST `/holidays`
+The backend runs by default on:
 
-Creates a new holiday.
+http://localhost:8080
 
-### DELETE `/holidays/{holidayId}` 
-Deletes a holiday by ID.
+---
 
-#### Example Request
+## 💻 Frontend
 
-```json
-{
-  "holidayLabel": "Summerholidays",
-  "employeeId": "klm012345",
-  "startOfHoliday": "2099-02-10T08:00:00Z",
-  "endOfHoliday": "2099-02-20T08:00:00Z"
-}
+The frontend is implemented as a Single Page Application using Angular.
+
+### Key Characteristics
+
+- Component-based architecture
+- Dedicated service layer for API communication
+- Reactive forms with validation
+- Clear separation between UI logic and data access
+- Functional and minimalistic UI
+
+The frontend runs by default on:
+
+http://localhost:4200
+
+---
+
+## ⚙️ How to Run the Application
+
+### 1️⃣ Start the Backend
+
+Navigate to the backend directory:
+
+```bash
+cd backend
+```
+
+Build and run the Spring Boot application:
+
+```bash
+mvn clean install
+mvn spring-boot:run
+```
+### 2️⃣ Start the Frontend
+Navigate to the frontend directory:
+
+```bash
+cd frontend
+```
+Install dependencies and start the Angular application:
+
+```bash
+npm install
+```
+
+Start the development server:
+
+```bash
+ng serve
 ```
 ---
-## Running the Application
 
-### Build the project
-```bash ./mvnw clean install ``` 
+### API
+Base endpoint example:
 
-### Run the application 
-```bash ./mvnw spring-boot:run ``` 
-The application will start on `http://localhost:8080`.
+http://localhost:8080/holidays
 
-### Access Swagger UI 
-Navigate to `http://localhost:8080/swagger-ui.html` 
-to explore the API documentation and test endpoints. 
+Supported operations:
 
+- GET /holidays – Retrieve all holidays
+- POST /holidays – Create a new holiday
+- DELETE /holidays/{id} – Delete a holiday
+- The API follows REST principles and uses JSON for request/response bodies.
