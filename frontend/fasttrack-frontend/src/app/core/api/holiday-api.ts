@@ -16,28 +16,27 @@ export interface HolidayDto {
 export interface CreateHolidayRequest {
   holidayLabel: string;
   employeeId: string;
-  startOfHoliday: string;
-  endOfHoliday: string;
+  startOfHoliday?: string;
+  endOfHoliday?: string;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class HolidayApi {
-  private readonly baseUrl = 'http://localhost:8080';
-  private readonly holidaysUrl = `${this.baseUrl}/holidays`;
+  private readonly baseUrl = 'http://localhost:8080/holidays';
 
   constructor(private http: HttpClient) {}
 
   list(): Observable<HolidayDto[]> {
-    return this.http.get<HolidayDto[]>(this.holidaysUrl);
+    return this.http.get<HolidayDto[]>(this.baseUrl);
   }
 
   create(req: CreateHolidayRequest): Observable<HolidayDto> {
-    return this.http.post<HolidayDto>(this.holidaysUrl, req);
+    return this.http.post<HolidayDto>(this.baseUrl, req);
   }
 
   delete(holidayId: string): Observable<void> {
-    return this.http.delete<void>(`${this.holidaysUrl}/${holidayId}`);
+    return this.http.delete<void>(`${this.baseUrl}/${holidayId}`);
   }
 }

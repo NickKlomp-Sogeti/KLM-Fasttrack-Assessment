@@ -1,59 +1,50 @@
-# FasttrackFrontend
+# FastTrack Holidays — Frontend (Angular)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.4.
+Single Page Application (SPA) for the FastTrack Holidays assignment: view, create and cancel holidays for crew members.
 
-## Development server
+This frontend talks to a Spring Boot backend via REST.
 
-To start a local development server, run:
+> Assignment context & business rules (gap between holidays, planning/cancel deadlines, no overlap) are defined in the assignment description. :contentReference[oaicite:0]{index=0}  
+> In this sprint the UI focuses on the MVP flows (list/create/cancel). Validation/business rules are primarily enforced by the backend.
 
+---
+
+## Tech stack
+- Angular (standalone components)
+- RxJS
+- Reactive Forms
+- HttpClient
+
+---
+
+## Prerequisites
+- Node.js + npm (project uses npm; see `package.json` for the packageManager version)
+- Backend running locally (default: `http://localhost:8080`)
+
+---
+
+## Running locally
+
+### 1) Install dependencies
+```bash
+npm install
+```
+
+### 2) Start the frontend
+```bash
+npm start
+```
+OR
 ```bash
 ng serve
 ```
+This will start the Angular development server and open the app in your default browser at `http://localhost:4200`. 
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### 3) Ensure backend is running 
+Make sure the Spring Boot backend is running locally (default: `http://localhost:8080`) so the frontend can communicate with it. 
+--- 
+## Notes 
+- The UI focuses on core flows (viewing, creating, canceling holidays). Validation and business rules are primarily enforced by the backend. 
+- The app uses Angular's HttpClient to make REST calls to the backend API. 
+- Reactive Forms are used for the holiday creation form.
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

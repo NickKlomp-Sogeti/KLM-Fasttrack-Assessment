@@ -12,8 +12,14 @@ pnpm-debug.log*
 # =========================
 dist/
 out-tsc/
+.angular/
 .tmp/
 .cache/
+
+# =========================
+# Test coverage
+# =========================
+coverage/
 
 # =========================
 # Environment files (optional strategy)
@@ -24,6 +30,7 @@ out-tsc/
 # =========================
 # IDEs / Editors
 # =========================
+
 # VS Code
 .vscode/
 !.vscode/extensions.json
@@ -31,20 +38,20 @@ out-tsc/
 # IntelliJ / WebStorm
 .idea/
 *.iml
+*.ipr
+*.iws
 
-# MacOS
+# =========================
+# OS
+# =========================
 .DS_Store
+Thumbs.db
 
 # =========================
 # Logs
 # =========================
-logs
+logs/
 *.log
-
-# =========================
-# Coverage
-# =========================
-coverage/
 
 # =========================
 # Temporary files

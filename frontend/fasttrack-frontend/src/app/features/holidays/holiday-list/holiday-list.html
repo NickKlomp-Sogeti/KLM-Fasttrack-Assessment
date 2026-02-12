@@ -1,63 +1,141 @@
-<h1>Holidays</h1>
+<div class="page">
+  <header class="page__header">
+    <h1 class="page__title">Holidays</h1>
+    <p class="page__subtitle">View, create and cancel scheduled holidays.</p>
+  </header>
 
-<div style="margin-bottom: 16px; padding: 12px; border: 1px solid #ddd;">
-  <h3>Create holiday</h3>
+  <section class="card">
+    <div class="card__header">
+      <h2 class="card__title">Create holiday</h2>
+    </div>
 
-  <div *ngIf="error" style="color: #b00020; margin-bottom: 8px;">
-    {{ error }}
-  </div>
+    @if (error) {
+      <div class="alert alert--error" role="alert">
+        {{ error }}
+      </div>
+    }
 
-  <form [formGroup]="form" (ngSubmit)="create()" style="display: grid; gap: 8px; max-width: 420px;">
-    <label>
-      Employee ID
-      <input formControlName="employeeId" placeholder="klm012345" />
-    </label>
-    <small *ngIf="form.controls['employeeId']?.touched && form.controls['employeeId']?.invalid" style="color:#b00020;">
-      Must match klm + 6 digits (e.g. klm012345)
-    </small>
+    <form class="form" [formGroup]="form" (ngSubmit)="create()">
+      <div class="form__grid">
+        <div class="field">
+          <label class="field__label" for="employeeId">Employee ID</label>
+          <input
+            id="employeeId"
+            class="field__input"
+            formControlName="employeeId"
+            placeholder="klm012345"
+            autocomplete="off"
+          />
 
-    <label>
-      Label
-      <input formControlName="holidayLabel" placeholder="Summerholidays" />
-    </label>
+          @if (form.controls['employeeId']?.touched && form.controls['employeeId']?.invalid) {
+            <p class="field__error">
+              Must match <strong>klm</strong> + 6 digits (e.g. klm012345)
+            </p>
+          }
+        </div>
 
-    <label>
-      Start
-      <input type="datetime-local" formControlName="startOfHoliday" />
-    </label>
+        <div class="field">
+          <label class="field__label" for="holidayLabel">Label</label>
+          <input
+            id="holidayLabel"
+            class="field__input"
+            formControlName="holidayLabel"
+            placeholder="Summerholidays"
+            autocomplete="off"
+          />
 
-    <label>
-      End
-      <input type="datetime-local" formControlName="endOfHoliday" />
-    </label>
+          @if (form.controls['holidayLabel']?.touched && form.controls['holidayLabel']?.hasError('required')) {
+            <p class="field__error">Label is required.</p>
+          }
+        </div>
 
-    <button type="submit">Create</button>
-  </form>
+        <div class="field">
+          <label class="field__label" for="startOfHoliday">Start</label>
+          <input
+            id="startOfHoliday"
+            class="field__input"
+            type="datetime-local"
+            formControlName="startOfHoliday"
+          />
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="endOfHoliday">End</label>
+          <input
+            id="endOfHoliday"
+            class="field__input"
+            type="datetime-local"
+            formControlName="endOfHoliday"
+          />
+        </div>
+      </div>
+
+      <div class="form__actions">
+        <button class="btn btn--primary" type="submit" [disabled]="loading || form.invalid">
+          Create
+        </button>
+        <button class="btn btn--ghost" type="button" (click)="form.reset()" [disabled]="loading">
+          Clear
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <section class="card">
+    <div class="card__header card__header--row">
+      <h2 class="card__title">Scheduled holidays</h2>
+
+      @if (loading) {
+        <div class="status">
+          <span class="spinner" aria-hidden="true"></span>
+          <span>Loading…</span>
+        </div>
+      }
+    </div>
+
+    @if (!loading) {
+      <div class="table-wrap">
+        <table class="table" aria-label="Holiday list">
+          <thead>
+          <tr>
+            <th>Label</th>
+            <th>Employee</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Status</th>
+            <th class="table__actions"></th>
+          </tr>
+          </thead>
+
+          <tbody>
+            @if (!holidays.length) {
+              <tr>
+                <td colspan="6" class="table__empty">No holidays found.</td>
+              </tr>
+            } @else {
+              @for (h of holidays; track h.holidayId) {
+                <tr>
+                  <td>{{ h.holidayLabel }}</td>
+                  <td><span class="pill">{{ h.employeeId }}</span></td>
+                  <td>{{ h.startOfHoliday | date:'yyyy-MM-dd HH:mm' }}</td>
+                  <td>{{ h.endOfHoliday | date:'yyyy-MM-dd HH:mm' }}</td>
+                  <td><span class="pill pill--muted">{{ h.status }}</span></td>
+                  <td class="table__actions">
+                    <button
+                      class="btn btn--danger"
+                      type="button"
+                      (click)="remove(h.holidayId)"
+                      [disabled]="loading"
+                    >
+                      Cancel
+                    </button>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
 </div>
-
-<div *ngIf="loading">Loading...</div>
-
-<table *ngIf="!loading" border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%;">
-  <thead>
-  <tr>
-    <th>Label</th>
-    <th>Employee</th>
-    <th>Start</th>
-    <th>End</th>
-    <th>Status</th>
-    <th></th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr *ngFor="let h of holidays">
-    <td>{{ h.holidayLabel }}</td>
-    <td>{{ h.employeeId }}</td>
-    <td>{{ h.startOfHoliday }}</td>
-    <td>{{ h.endOfHoliday }}</td>
-    <td>{{ h.status }}</td>
-    <td>
-      <button (click)="remove(h.holidayId)">Cancel</button>
-    </td>
-  </tr>
-  </tbody>
-</table>

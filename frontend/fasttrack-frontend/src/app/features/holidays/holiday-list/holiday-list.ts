@@ -3,10 +3,15 @@ import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
   Validators,
-  UntypedFormBuilder,
-  UntypedFormGroup,
+  NonNullableFormBuilder,
+  FormGroup,
 } from '@angular/forms';
-import { HolidayApi, HolidayDto } from '../../../core/api/holiday-api';
+import { finalize } from 'rxjs/operators';
+import {
+  HolidayApi,
+  HolidayDto,
+  CreateHolidayRequest,
+} from '../../../core/api/holiday-api';
 
 @Component({
   selector: 'app-holiday-list',
@@ -20,35 +25,32 @@ export class HolidayList implements OnInit {
   loading = false;
   error: string | null = null;
 
-  form: UntypedFormGroup;
+  form: FormGroup;
 
-  constructor(private api: HolidayApi, private fb: UntypedFormBuilder) {
+  constructor(private api: HolidayApi, private fb: NonNullableFormBuilder) {
+    // start/end are optional: no Validators.required
     this.form = this.fb.group({
       employeeId: ['', [Validators.required, Validators.pattern(/^klm[0-9]{6}$/)]],
-      holidayLabel: ['', [Validators.required]],
-      startOfHoliday: ['', [Validators.required]],
-      endOfHoliday: ['', [Validators.required]],
+      holidayLabel: ['', Validators.required],
+      startOfHoliday: [''],
+      endOfHoliday: [''],
     });
   }
 
   ngOnInit(): void {
-    this.refresh();
+    this.loadHolidays();
   }
 
-  refresh(): void {
-    this.loading = true;
-    this.error = null;
+  private loadHolidays(): void {
+    this.setBusy(true);
 
-    this.api.list().subscribe({
-      next: (data: HolidayDto[]) => {
-        this.holidays = data ?? [];
-        this.loading = false;
-      },
-      error: (err: any) => {
-        this.error = err?.error?.message ?? 'Failed to load holidays';
-        this.loading = false;
-      },
-    });
+    this.api
+      .list()
+      .pipe(finalize(() => this.setBusy(false)))
+      .subscribe({
+        next: (data) => (this.holidays = data ?? []),
+        error: (err) => (this.error = this.extractErrorMessage(err, 'Failed to load holidays.')),
+      });
   }
 
   create(): void {
@@ -57,39 +59,66 @@ export class HolidayList implements OnInit {
       return;
     }
 
-    this.error = null;
+    this.setBusy(true);
 
-    // datetime-local gives "YYYY-MM-DDTHH:mm" (no timezone)
-    // Convert to UTC ISO-8601 so Spring can parse it reliably.
-    const v: any = this.form.getRawValue();
-    const req = {
-      employeeId: v.employeeId,
-      holidayLabel: v.holidayLabel,
-      startOfHoliday: new Date(v.startOfHoliday).toISOString(),
-      endOfHoliday: new Date(v.endOfHoliday).toISOString(),
+    const v = this.form.getRawValue();
+
+    const payload: CreateHolidayRequest = {
+      employeeId: v.employeeId.trim().toLowerCase(),
+      holidayLabel: v.holidayLabel.trim(),
     };
 
-    this.api.create(req).subscribe({
-      next: () => {
-        this.form.reset();
-        this.refresh();
-      },
-      error: (err: any) => {
-        this.error = err?.error?.message ?? 'Failed to create holiday';
-      },
-    });
+    const startIso = this.toIsoIfProvided(v.startOfHoliday);
+    if (startIso) payload.startOfHoliday = startIso;
+
+    const endIso = this.toIsoIfProvided(v.endOfHoliday);
+    if (endIso) payload.endOfHoliday = endIso;
+
+    this.api
+      .create(payload)
+      .pipe(finalize(() => this.setBusy(false)))
+      .subscribe({
+        next: () => {
+          this.form.reset();
+          this.loadHolidays();
+        },
+        error: (err) => (this.error = this.extractErrorMessage(err, 'Failed to create holiday.')),
+      });
   }
 
-  remove(id: string): void {
+  remove(holidayId: string): void {
     if (!confirm('Cancel this holiday?')) return;
 
-    this.error = null;
+    this.setBusy(true);
 
-    this.api.delete(id).subscribe({
-      next: () => this.refresh(),
-      error: (err: any) => {
-        this.error = err?.error?.message ?? 'Failed to cancel holiday';
-      },
-    });
+    this.api
+      .delete(holidayId)
+      .pipe(finalize(() => this.setBusy(false)))
+      .subscribe({
+        next: () => this.loadHolidays(),
+        error: (err) => (this.error = this.extractErrorMessage(err, 'Failed to cancel holiday.')),
+      });
+  }
+
+  private setBusy(isBusy: boolean): void {
+    this.loading = isBusy;
+    if (isBusy) this.error = null;
+  }
+
+  private toIsoIfProvided(value: unknown): string | null {
+    if (typeof value !== 'string') return null;
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+
+    const date = new Date(trimmed);
+    return Number.isNaN(date.getTime()) ? null : date.toISOString();
+  }
+
+  private extractErrorMessage(err: unknown, fallback: string): string {
+    const e = err as any;
+    if (e?.error?.message) return e.error.message;
+    if (typeof e?.error === 'string' && e.error.trim()) return e.error;
+    if (typeof e?.message === 'string' && e.message.trim()) return e.message;
+    return fallback;
   }
 }
