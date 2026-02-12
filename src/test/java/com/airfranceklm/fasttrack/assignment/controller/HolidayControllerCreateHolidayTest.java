@@ -22,10 +22,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(HolidayController.class)
 class HolidayControllerCreateHolidayTest {
 
-    @Autowired MockMvc mockMvc;
-    @Autowired ObjectMapper objectMapper;
+    @Autowired
+    MockMvc mockMvc;
 
-    @MockBean HolidayService holidayService;
+    @Autowired
+    ObjectMapper objectMapper;
+
+    @MockBean
+    HolidayService holidayService;
 
     @Test
     void createHoliday_returns201AndBody() throws Exception {

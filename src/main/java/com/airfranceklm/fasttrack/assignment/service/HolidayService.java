@@ -3,6 +3,7 @@ package com.airfranceklm.fasttrack.assignment.service;
 import com.airfranceklm.fasttrack.assignment.dto.HolidayCreateRequestDto;
 import com.airfranceklm.fasttrack.assignment.dto.HolidayResponseDto;
 import com.airfranceklm.fasttrack.assignment.exception.EmployeeNotFoundException;
+import com.airfranceklm.fasttrack.assignment.exception.HolidayNotFoundException;
 import com.airfranceklm.fasttrack.assignment.exception.HolidayValidationException;
 import com.airfranceklm.fasttrack.assignment.model.Employee;
 import com.airfranceklm.fasttrack.assignment.model.Holiday;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.UUID;
 
 @Transactional
 @Service
@@ -47,6 +49,7 @@ public class HolidayService {
                 .toList();
     }
 
+    // Creates a new holiday based on the provided DTO. Validates the input and business rules before saving.
     public HolidayResponseDto createHoliday(HolidayCreateRequestDto dto) {
         HolidayStatus status;
         OffsetDateTime start = dto.startOfHoliday();
@@ -87,6 +90,20 @@ public class HolidayService {
 
         Holiday saved = holidayRepository.save(holiday);
         return HolidayResponseDto.from(saved);
+    }
+
+    // Cancels a holiday by its ID. Only holidays with status SCHEDULED can be canceled, and there must be at least 5 working days between the cancellation date and the start of the holiday.
+    public void cancelHoliday(UUID holidayId) {
+        Holiday holiday = holidayRepository.findById(holidayId)
+                .orElseThrow(() -> new HolidayNotFoundException("Holiday with ID " + holidayId + " not found"));
+
+        if (holiday.getStartOfHoliday() == null) {
+            throw new HolidayValidationException("Cannot cancel holiday without a start date");
+        }
+
+        validateCancellationAtLeastWorkingDaysAhead(holiday.getStartOfHoliday(), MIN_BOOKING_TIME);
+
+        holidayRepository.delete(holiday);
     }
 
     // Validates that the start date is before the end date
@@ -176,5 +193,18 @@ public class HolidayService {
     private boolean isWorkingDay(LocalDate date) {
         DayOfWeek dow = date.getDayOfWeek();
         return dow != DayOfWeek.SATURDAY && dow != DayOfWeek.SUNDAY;
+    }
+
+    // Validates that the holiday can only be canceled if there are at least minWorkingDays working days between the cancellation date and the start of the holiday
+    private void validateCancellationAtLeastWorkingDaysAhead(OffsetDateTime start, int minWorkingDays) {
+        LocalDate todayUtc = OffsetDateTime.now(ZoneOffset.UTC).toLocalDate();
+        LocalDate startDate = start.toLocalDate();
+
+        long workingDays = countWorkingDaysExclusive(todayUtc, startDate);
+        if (workingDays < minWorkingDays) {
+            throw new HolidayValidationException(
+                    "Holiday must be cancelled at least " + minWorkingDays + " working days before startOfHoliday"
+            );
+        }
     }
 }

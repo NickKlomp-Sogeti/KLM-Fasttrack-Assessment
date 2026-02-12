@@ -66,6 +66,9 @@ Returns holidays for a specific employee.
 
 Creates a new holiday.
 
+### DELETE `/holidays/{holidayId}` 
+Deletes a holiday by ID.
+
 #### Example Request
 
 ```json

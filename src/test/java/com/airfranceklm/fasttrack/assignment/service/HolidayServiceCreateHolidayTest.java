@@ -28,10 +28,14 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class HolidayServiceCreateHolidayTest {
 
-    @Mock HolidayRepository holidayRepository;
-    @Mock EmployeeRepository employeeRepository;
+    @Mock
+    HolidayRepository holidayRepository;
 
-    @InjectMocks HolidayService holidayService;
+    @Mock
+    EmployeeRepository employeeRepository;
+
+    @InjectMocks
+    HolidayService holidayService;
 
     private static final String EMPLOYEE_ID = "klm012345";
 

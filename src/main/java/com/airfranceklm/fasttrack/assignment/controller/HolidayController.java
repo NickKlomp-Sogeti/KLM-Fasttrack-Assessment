@@ -1,6 +1,7 @@
 package com.airfranceklm.fasttrack.assignment.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.airfranceklm.fasttrack.assignment.dto.HolidayCreateRequestDto;
 import com.airfranceklm.fasttrack.assignment.dto.HolidayResponseDto;
@@ -38,5 +39,11 @@ public class HolidayController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(created);
+    }
+
+    @DeleteMapping("/{holidayId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void cancelHoliday(@PathVariable UUID holidayId) {
+        holidayService.cancelHoliday(holidayId);
     }
 }
