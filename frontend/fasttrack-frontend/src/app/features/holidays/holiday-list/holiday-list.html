@@ -1,0 +1,63 @@
+<h1>Holidays</h1>
+
+<div style="margin-bottom: 16px; padding: 12px; border: 1px solid #ddd;">
+  <h3>Create holiday</h3>
+
+  <div *ngIf="error" style="color: #b00020; margin-bottom: 8px;">
+    {{ error }}
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="create()" style="display: grid; gap: 8px; max-width: 420px;">
+    <label>
+      Employee ID
+      <input formControlName="employeeId" placeholder="klm012345" />
+    </label>
+    <small *ngIf="form.controls['employeeId']?.touched && form.controls['employeeId']?.invalid" style="color:#b00020;">
+      Must match klm + 6 digits (e.g. klm012345)
+    </small>
+
+    <label>
+      Label
+      <input formControlName="holidayLabel" placeholder="Summerholidays" />
+    </label>
+
+    <label>
+      Start
+      <input type="datetime-local" formControlName="startOfHoliday" />
+    </label>
+
+    <label>
+      End
+      <input type="datetime-local" formControlName="endOfHoliday" />
+    </label>
+
+    <button type="submit">Create</button>
+  </form>
+</div>
+
+<div *ngIf="loading">Loading...</div>
+
+<table *ngIf="!loading" border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+  <thead>
+  <tr>
+    <th>Label</th>
+    <th>Employee</th>
+    <th>Start</th>
+    <th>End</th>
+    <th>Status</th>
+    <th></th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let h of holidays">
+    <td>{{ h.holidayLabel }}</td>
+    <td>{{ h.employeeId }}</td>
+    <td>{{ h.startOfHoliday }}</td>
+    <td>{{ h.endOfHoliday }}</td>
+    <td>{{ h.status }}</td>
+    <td>
+      <button (click)="remove(h.holidayId)">Cancel</button>
+    </td>
+  </tr>
+  </tbody>
+</table>
