@@ -97,6 +97,10 @@ public class HolidayService {
         Holiday holiday = holidayRepository.findById(holidayId)
                 .orElseThrow(() -> new HolidayNotFoundException("Holiday with ID " + holidayId + " not found"));
 
+        if (holiday.getStatus() != HolidayStatus.SCHEDULED) {
+            throw new HolidayValidationException("Only SCHEDULED holidays can be cancelled");
+        }
+
         if (holiday.getStartOfHoliday() == null) {
             throw new HolidayValidationException("Cannot cancel holiday without a start date");
         }
