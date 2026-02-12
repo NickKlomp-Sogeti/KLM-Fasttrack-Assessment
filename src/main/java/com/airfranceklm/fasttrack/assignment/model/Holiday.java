@@ -2,7 +2,6 @@ package com.airfranceklm.fasttrack.assignment.model;
 
 import com.airfranceklm.fasttrack.assignment.model.enums.HolidayStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,7 +17,6 @@ public class Holiday {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @NotNull
     private UUID holidayId;
 
     @Column(nullable = false)

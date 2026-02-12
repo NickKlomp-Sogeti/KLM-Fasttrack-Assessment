@@ -4,11 +4,15 @@
 
 This project is a Spring Boot backend application developed as part of the KLM FastTrack technical assessment.
 
-The current implementation covers **User Story 1**:
+The current implementation covers:
 
+### User Story 1
 > *As a crew member, I want to view an overview of my scheduled holidays.*
 
-The application provides REST endpoints to retrieve holiday data and supports filtering by employee.
+### User Story 2
+> *As a crew member, I want to schedule (create) a valid new holiday.*
+
+The application provides REST endpoints to retrieve and create holiday data, including validation of business rules.
 
 ---
 
@@ -35,12 +39,14 @@ Responsibilities are separated as follows:
   Handles HTTP requests and responses.
 
 - **Service**  
-  Contains application logic and maps entities to DTOs.
+  Contains business logic and validation rules.
 
 - **Repository**  
   Handles database interaction using Spring Data JPA.
 
-To prevent exposing persistence models directly, a DTO layer is used for API responses.
+A DTO layer is used to prevent exposing JPA entities directly.
+
+Global exception handling is implemented using `@RestControllerAdvice` to return consistent HTTP error responses.
 
 Seed data is provided via `data.sql` to allow immediate testing.
 
@@ -56,19 +62,19 @@ Returns all holidays.
 
 Returns holidays for a specific employee.
 
-### Example Response
+### POST `/holidays`
+
+Creates a new holiday.
+
+#### Example Request
 
 ```json
-[
-  {
-    "holidayId": "0f8fad5b-d9cb-469f-a165-70867728950e",
-    "holidayLabel": "Summerholidays",
-    "employeeId": "klm012345",
-    "startOfHoliday": "2022-08-02T08:00:00Z",
-    "endOfHoliday": "2022-08-16T08:00:00Z",
-    "status": "SCHEDULED"
-  }
-]
+{
+  "holidayLabel": "Summerholidays",
+  "employeeId": "klm012345",
+  "startOfHoliday": "2099-02-10T08:00:00Z",
+  "endOfHoliday": "2099-02-20T08:00:00Z"
+}
 ```
 ---
 ## Running the Application
